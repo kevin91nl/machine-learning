@@ -3,7 +3,7 @@ N = 2;
 
 eta = 0.01;
 
-% Generate the Nata
+% Generate the data
 P = 2;
 w = rand(N, N);
 theta = rand(1, N);
@@ -12,12 +12,12 @@ samples = [
     1 1
 ];
 
-% Calculate clampeN statistics
+% Calculate clamped statistics
 stat_1_c = 1 / P * sum(samples);
 stat_2_c = 1 / P * samples' * samples;
 
 for t = 1:200
-    % Converge to a low energy state anN collect samples from it
+    % Converge to a low energy state and collect samples from it
     num_samples = 500;
     K = 500;
     repr_samples = zeros(num_samples, N);
@@ -59,7 +59,7 @@ for t = 1:200
         end
     end
 
-    % Calculate Nerivatives
+    % Calculate derivatives
     dLdtheta = stat_1_c - stat_1;
     dLdw = stat_2_c - stat_2;
 
