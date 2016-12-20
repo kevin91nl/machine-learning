@@ -1,0 +1,7 @@
+% Set the number of neurons
+num_neurons = 4 * 4;
+
+% Initialize the weights and biases
+w = rand(num_neurons, num_neurons);
+theta = rand(num_neurons, 1);
+
