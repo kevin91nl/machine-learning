@@ -5,18 +5,7 @@ import numpy as np
 from scipy.stats import bernoulli
 
 
-class DataLoader:
-    def __init__(self, file):
-        self.data = scipy.io.loadmat(file, squeeze_me=True, struct_as_record=False)['mnist']
-        self.train_images = self.reshape_images(self.data.train_images)
-        self.test_images = self.reshape_images(self.data.test_images)
-        self.train_labels = self.data.train_labels
-        self.test_labels = self.data.test_labels
 
-    def reshape_images(self, data):
-        reshaped = data.reshape(data.shape[0] * data.shape[1], data.shape[2])
-        swapped_axes = np.swapaxes(reshaped, 0, 1)
-        return swapped_axes
 
 
 # data = DataLoader('mnistAll.mat')
