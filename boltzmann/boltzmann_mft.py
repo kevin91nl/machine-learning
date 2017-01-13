@@ -188,49 +188,50 @@ class BoltzmannMFT:
         return obj
 
 
-# Train (or load when exist) the Boltzmann machines
-boltzmann = []
-for digit in range(0, 10):
-    file = 'digit_%d.pickle' % digit
-    boltzmann.append(BoltzmannMFT(28 * 28))
-    if not os.path.exists(file):
-        print('Training Boltzmann machine for digit %d and store the result to %s...' % (digit, file))
-        data = DataLoader('mnistAll')
-        data.load_images(0.1)
-        training_samples = data.train_images[data.train_labels == digit]
-        boltzmann[digit].train(training_samples)
-        boltzmann[digit].save(file)
-    else:
-        print('Loading Boltzmann machine for digit %d from file %s...' % (digit, file))
-        boltzmann[digit] = BoltzmannMFT.load(file)
+if __name__ == '__main__':
+	# Train (or load when exist) the Boltzmann machines
+	boltzmann = []
+	for digit in range(0, 10):
+	    file = 'digit_%d.pickle' % digit
+	    boltzmann.append(BoltzmannMFT(28 * 28))
+	    if not os.path.exists(file):
+		print('Training Boltzmann machine for digit %d and store the result to %s...' % (digit, file))
+		data = DataLoader('mnistAll')
+		data.load_images(0.1)
+		training_samples = data.train_images[data.train_labels == digit]
+		boltzmann[digit].train(training_samples)
+		boltzmann[digit].save(file)
+	    else:
+		print('Loading Boltzmann machine for digit %d from file %s...' % (digit, file))
+		boltzmann[digit] = BoltzmannMFT.load(file)
 
-file = 'probabilities.pickle'
-if not os.path.exists(file):
-    data = DataLoader('mnistAll')
-    data.load_images(0.1)
-    testset = data.test_images[data.test_labels]
-    probabilities = []
-    for digit in range(0, 10):
-        print('Calculating classifier probabilities for the Boltzmann machine for digit %d...' % digit)
-        clf_probabilities = calculate_state_probability(testset, boltzmann[digit].w, boltzmann[digit].theta, boltzmann[digit].F)
-        probabilities.append(clf_probabilities)
-    probabilities = np.matrix(probabilities)
-    with open(file, 'wb') as handle:
-        pickle.dump(probabilities, handle)
-else:
-    print('Loading classifier probabilities...')
-    with open(file, 'rb') as handle:
-        probabilities = pickle.load(handle)
+	file = 'probabilities.pickle'
+	if not os.path.exists(file):
+	    data = DataLoader('mnistAll')
+	    data.load_images(0.1)
+	    testset = data.test_images[data.test_labels]
+	    probabilities = []
+	    for digit in range(0, 10):
+		print('Calculating classifier probabilities for the Boltzmann machine for digit %d...' % digit)
+		clf_probabilities = calculate_state_probability(testset, boltzmann[digit].w, boltzmann[digit].theta, boltzmann[digit].F)
+		probabilities.append(clf_probabilities)
+	    probabilities = np.matrix(probabilities)
+	    with open(file, 'wb') as handle:
+		pickle.dump(probabilities, handle)
+	else:
+	    print('Loading classifier probabilities...')
+	    with open(file, 'rb') as handle:
+		probabilities = pickle.load(handle)
 
-data = DataLoader('mnistAll')
-real = data.test_labels
-predicted = np.squeeze(np.asarray(np.argmax(probabilities, 0)))
-print(predicted[:20])
-print(real[:20])
-cm = confusion_matrix(real, predicted)
-plt.imshow(cm)
-plt.show()
+	data = DataLoader('mnistAll')
+	real = data.test_labels
+	predicted = np.squeeze(np.asarray(np.argmax(probabilities, 0)))
+	print(predicted[:20])
+	print(real[:20])
+	cm = confusion_matrix(real, predicted)
+	plt.imshow(cm)
+	plt.show()
 
-for digit in range(0, 10):
-    print(np.min(boltzmann[digit].m))
-    print(np.max(boltzmann[digit].m))
+	for digit in range(0, 10):
+	    print(np.min(boltzmann[digit].m))
+	    print(np.max(boltzmann[digit].m))
