@@ -51,12 +51,62 @@ The report for each exercise addresses following points:
 
 
 \section{Problem statement}
+\subsection{Controlled random walk}
+In the controlled random walk problem, the rate of change of the state is defined as follows:
+
+\begin{equation}
+dx = u dt + d\xi
+\label{eq:crw_dx}
+\end{equation}
+
+The state has initial position $x$ at $t = 0$. The noise variance is $\langle d \xi^2 \rangle = \nu dt$.
+
+There are two targets at $t = T$ at locations $x = \pm 1$. The end-cost function $\phi$ is defined such that it has delta peaks at the targets:
+
+\begin{equation}
+\phi(x(T)) = \begin{cases}
+0 & x(T) = \pm 1\\
+\infty & \mbox{otherwise}
+\end{cases}
+\label{eq:crw_phi}
+\end{equation}
+
+The optimal control for this problem satisfies:
+
+\begin{equation}
+u^{*}(t, x) = \frac{\tanh(x / (\nu (T - t)) - x}{T - t}
+\label{eq:crw_u}
+\end{equation}
+
+The following research questions are discussed for the controlled random walk problem in this report:
+\begin{itemize}
+\item How does the optimal control depend on parameters $\nu$ and $T$ numerically?
+\item How does the delayed choice mechanism work?
+\end{itemize}
+
+\subsection{Mountain car problem}
+The following research questions are discussed for the mountain car problem in this report:
+\begin{itemize}
+\item What is the optimal control policy for this problem?
+\end{itemize}
 
 \section{Results}
+\subsection{Controlled random walk}
+\subsubsection{How does the optimal control depend on parameters $\nu$ and $T$ numerically?}
+
+
+\subsubsection{How does the delayed choice mechanism work?}
+
+\subsection{Mountain car problem}
 
 \section{Discussion}
+\subsection{Controlled random walk}
+\subsection{Mountain car problem}
 
 \section{Conclusion}
+\subsection{Controlled random walk}
+\subsection{Mountain car problem}
 
+\newpage
 \section{Appendix}
 \end{document}
