@@ -9,8 +9,8 @@
 \author{Kevin Jacobs, Zhuoran Liu, Ankur Ankan}
 
 \begin{document}
-\section*{Introduction}
-\subsection*{Boltzmann Machines}
+\section{Introduction}
+\subsection{Boltzmann Machines}
 A Boltzmann Machine consists of a set of binary units, $ s $ and all these units are 
 connected to each other with a weight, $ w_{ij} $ associated with each connection.
 The global energy, $ E $ of the Boltzmann Machine is given by:
@@ -44,19 +44,15 @@ and then we update our weights based on these values:
 & \frac{\partial L}{\partial w_{ij}} = <s_i s_j>_c - <s_i s_j> 
 \end{split} \end{equation}
 
-\subsection*{Mean Field Theory}
-
-
-\section*{Research Questions}
+\section{Research Questions}
 \begin{enumerate}
   \item Adding noise to the MNIST Dataset
   \item Sampling vs Mean Field
-  \item Burn-in period of the sampling algorithm
 \end{enumerate}
 
-\section*{Results}
+\section{Results}
 
-\subsection*{Accuracy of the model with varying levels of noise}
+\subsection{Accuracy of the model with varying levels of noise}
 Each image in the MNIST dataset is represented by a 28x28 pixel. We first 
 binarized it and added noise so that the matix $ C $ doesn't get singular.
 
@@ -113,17 +109,65 @@ There are 3 main features of the graph:
 
 \end{enumerate}
 
-\subsection*{Comparision of Sampling Methods and Mean Field Approximation}
+\subsection{Comparision of Sampling Methods and Mean Field Approximation}
+For learning a Boltzmann machine we need to compare the free and the clamped
+statistics. The probability distribution represented by a Boltzmann machine
+is given by:
 
-Since the total possible number of states in a Boltzmann Machine is $ 2^n $, 
-therefore it's not feasible to use exact method for computing the free 
-statistics. Therefore, we used sampling methods and Mean Field and compared
-the results.
+$$ p(s) = \frac{1}{Z} e^{-E(s)} $$
+where: 
+\begin{equation}
+  \begin{split}
+    & E(s) = - \frac{1}{2} \sum_{ij} w_{ij} s_i s_j  + \sum_i \theta_i s_i \\
+    & Z = \sum exp(-E(s)) 
+  \end{split}
+\end{equation}
 
-\subsection*{Variation with burn in period}
+Here if we try to compute the distribution using any exact method we will need
+to compute the value of $ Z $ for which we will need to compute the sum over
+all the possible $ 2^n $ states of the Boltzmann machine. This is not feasible 
+even in the case of relatively smaller networks because we need to compute the 
+free statistics in each iteration until convergence. Therefore we need to use
+some approximate techniques. For the assignment we used Gibbs sampling and 
+Mean Field theory for approximating the free statistics.
 
-\section*{Conclusion}
+\begin{enumerate}
+  \item \textbf{Behaviour in case of Gibbs Sampling}
+    We tested the effect of varying the number of samples and burn in period on
+    the convergence of our learning rule. For this we used a network of 10 
+    neurons and trained on 50 random input patterns. We initialized the weights
+    and biases using random samples from a Normal Distribution with mean 0 and 
+    variance 1.
 
-\section*{Appendix}
+    For comparing the rate of convergence, we fitted a straight line to the 
+    absolute change in weights with number of iterations as shown in Fig. 
+    \ref{fig:sampling}. We also plotted a grid (Fig. \ref{sampling_grid}) for 
+    value of slope for different values of burn-in samples and number of used
+    samples.
+
+
+  \item \textbf{Approximating using Mean Field Theory}
+    TODO: Mean Field theory
+
+\end{enumerate}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{sampling}
+  \caption{Absolute change in weight with iteration}
+  \label{fig:noise_vs_acc}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{sampling_grid}
+  \caption{Variation of slope for different values of used samples and burn in 
+  samples}
+  \label{fig:noise_vs_acc}
+\end{figure}
+
+\section{Conclusion}
+
+\section{Appendix}
 
 \end{document}
