@@ -48,20 +48,79 @@ and then we update our weights based on these values:
 
 
 \section*{Research Questions}
-\subsection*{Adding noise to the MNIST Dataset}
-TODO: Why do we need noise. We studied the accuracy of the Boltzmann Machine
-on different levels of noise.
+\begin{enumerate}
+  \item Adding noise to the MNIST Dataset
+  \item Sampling vs Mean Field
+  \item Burn-in period of the sampling algorithm
+\end{enumerate}
 
-\subsection*{Sampling vs Mean Field}
+\section*{Results}
+
+\subsection*{Accuracy of the model with varying levels of noise}
+Each image in the MNIST dataset is represented by a 28x28 pixel. We first 
+binarized it and added noise so that the matix $ C $ doesn't get singular.
+
+For adding the noise to the image we created a noise mask for each pixel. Each
+pixel in the mast has a value of $ -1 $ with probability $ p $ and value $ 1 $
+with probability $ 1-p $. Then we do an element-wise multiplication of the 
+binary image and the noise mask. Therefore when $ p=0 $, there shouldn't be any
+distortion in the image whereas for $ p=1 $ every bit should be flipped but 
+there won't be any change in the structure. For $ p=0.5 $, the maximum noise
+will be obtained and the image will be completely distorted. We can see these
+effects in Fig. \ref{fig:noise_level}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{noise}
+  \caption{Different noise levels along with the final masked images}
+  \label{fig:noise_level}
+\end{figure}
+
+We tried to run our Boltzmann machine on varying levels of noise and computed
+the accuracy of our model.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{noise_vs_acc}
+  \caption{Accuracy of the model with varying noise level}
+  \label{fig:noise_vs_acc}
+\end{figure}
+
+There are 3 main features of the graph:
+\begin{enumerate}
+
+  \item \textbf {Low accuracy at low noise levels} \break
+    In Fig. \ref{fig:noise_vs_acc}, we can see that for very low levels of noise 
+    (around 0.00 - 0.03) we have an accuracy of around $ 0.1 $ which is 
+    equivalent to random guessing. This low accuracy can be explained by the 
+    fact that due to low noise levels some of the pixels in the all the images
+    are the same. For example the top-left pixel or the top-right pixel will
+    be off in almost all the images. And these constant pixels makes the matrix
+    $ C $ approach towards singularity resulting in low accuracy.
+
+  \item \textbf{Highest accuracy at around noise level of 0.1} \break
+    The accuracy of the model starts increasing at around $ p=0.04 $, gets 
+    around $ 0.9 $ accuracy for $ p \approx 0.5 $ reaching the maximum at 
+    $ p \approx 0.1 $ and the gradually decrease as we increase the noise
+    level in the data.
+
+  \item \textbf{Dip at $ p=0.47 $ and accuracy of $ 0.1 $ at $ p=0.5 $} \break
+    We see a dip in the accuracy value at $ p=0.47 $ where it is almost $ 0 $.
+    We coudn't find any good possible explanation for this behaviour. For 
+    $ p = 0.5 $ we again get an accuracy of $ 0.1 $. This behaviour can be 
+    explained since our images are completely distored now, the model's 
+    performace is equivalent to random guessing.
+
+\end{enumerate}
+
+\subsection*{Comparision of Sampling Methods and Mean Field Approximation}
+
 Since the total possible number of states in a Boltzmann Machine is $ 2^n $, 
 therefore it's not feasible to use exact method for computing the free 
 statistics. Therefore, we used sampling methods and Mean Field and compared
 the results.
 
-\section*{Results}
-\subsection*{Accuracy of the model with varying levels of noise}
-
-\subsection{Comparision of Sampling Methods and Mean Field Approximation}
+\subsection*{Variation with burn in period}
 
 \section*{Conclusion}
 
