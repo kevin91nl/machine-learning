@@ -36,23 +36,46 @@ This four step will backpropagate error and output the gradient change of cost f
 \section{Results}
 \subsection{The structure of Multi-Layer Perceptron}
 \subsubsection{Different neurons}
+The first problem to investigate is the influence on classification accuracies from the number of neurons in hidden layers. We did the experiment with five different settings. All the settings have one hidden layer with different neurons. All five experiments used same input layer ($784$) and output layer, and used same epoches (1$50$), same learning rate ($0.05$) and same mini-batch number ($10$). The plot below shows the results of five different setting.Blue line is $2$ neurons, red line is $5$ neurons, black line is $10$ neurons, green line is $20$ neurons and magenta line is $100$ neurons.\\
 \includegraphics[width=90mm,scale=1]{p101.jpg}\\
+The horizontal axis showed the epoches changed from $0$ to $150$, and the vertical axis showed the test accuracies in percentage. The formula is
+\[\text{accuracy} = \frac{\text{right classified number in test images}}{ \text{total number in test images}}\]\\
+From the plot we can easily see that, if there is one hidden layer, more hidden neurons will yield better results. But in small amount of epches, less neurons may have better results. For example, blue line is better than red and black in epoch $6$.\\
+More neurons will take more training time, and the relationship between neurons and time are almost linear. The plot below is the running time of the five experiments we mentioned above.\\
 \includegraphics[width=90mm,scale=1]{p102.jpg}\\
+From this figure, we can easily see that the relationship between neurons and time is almost linear.
 \subsubsection{Different layers}
+The second problem to investigate is the influence on classification accuracies from the number of hidden layers. We did the experiment with five different settings. The settings of hidden layer number ranges from $1$ to $5$, and in each hidden layer we used $5$ neurons. All five experiments used same input layer ($784$) and output layer, and used same epoches ($100$), same learning rate ($0.05$) and same mini-batch number ($10$). The plot below shows the results of five different settings.\\
 \includegraphics[width=90mm,scale=1]{p103.jpg}\\
+From the figure, we can see that $4$ hidden layers had a bad performance. The other experiments almost performed the same. This problem may be caused by the training data. Since we just need to classify number $3$ and number $7$, so no more complicated model should be trained. So more layers didn't perform better.\\
+More layers will take more training time, and the relationship between layers' number and time are almost linear. The plot below is the running time of the five experiments we mentioned above.\\
 \includegraphics[width=90mm,scale=1]{p104.jpg}\\
+From this figure, we can easily see that the relationship between number of layers and time is almost linear.
+
 \subsection{The initialization of the weights and biases}
-
+By default we choose the initialization of weights and biases using Gausssian random variables with mean $0$ and deviation $1$. Here we used another way to improve it such that we can have a better initialization and better results.
 \subsubsection{different initialization of weights and biases}
+Here we mainly considered the initialization with a normalized Gaussian. The formula is\\
+\[\text{initialization of weights}= \frac{\text{random} (y, x)}{\sqrt{x}}\]\\
+This setting can make the distribution more sharply peaked whcih makes it less likely that neuron will saturate. We did experiment for both initializations and have the results below.Both experiments used same input layer ($784$) and output layer, and used same epoches ($150$), same learning rate ($0.05$) and same mini-batch number ($10$).Both with $1$ hidden layer and $100$ neurons. The plot below shows the results of two different settings.\\
 \includegraphics[width=90mm,scale=1]{p201.jpg}\\
-
+From the figure, we can easily see that. Optimized initialization with a normalizing component will make the initial accuracy munch higher than the default gaussian distribution. Also it showed a better result than the default setting.
 \subsubsection{different activation functions}
+By default we used sigmoid function as the activation function. Here we compared the sigmoid function with tanh function.\\
 \includegraphics[width=90mm,scale=1]{p301.jpg}\\
+From this figure we can see that sigmoid did better, since the initialization is better.\\
+With better initialization of tanh!!
 
 
 \subsection{Different learning methods}
-\subsubsection{Stochastic gradient descent}
-\subsubsection{Momentum learning}
+\subsubsection{Stochastic gradient descent vs. Momentum}
+Momentum is a method to escape from local minimum, and it did speed up the learning process by changing gradient direction more straight forward to the target. We used two formulas to implement the momentum learning.
+\[v' = \mu v - \eta \nabla C\]
+\[w' = w + v'\]
+After implementation we got the results compared with stochastic gradient method as below.\\
+\includegraphics[width=90mm,scale=1]{p401.jpg}\\
+From this figure, we can easily see that momentum(blue) convergence faster??
+
 
 
 \section{Discussion}
