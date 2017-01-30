@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{amsmath}
+\usepackage{minted}
 
 \title{Boltzmann Machine}
 \author{Kevin Jacobs, Zhuoran Liu, Ankur Ankan}
@@ -47,25 +48,27 @@ and then we update our weights based on these values:
 \section{Research Questions}
 \begin{enumerate}
   \item Adding noise to the MNIST Dataset
-  \item Sampling vs Mean Field
+  \item Sampling vs Mean Field Approximation
 \end{enumerate}
 
 \section{Results}
 
 \subsection{Accuracy of the model with varying levels of noise}
 Each image in the MNIST dataset is represented by a 28x28 pixel. We first 
-binarized it and added noise so that the matix $ C $ doesn't get singular.
+binarized it and added random noise to the image so that the matix $ C $ in our
+computation isn't singular.
 
 For adding the noise to the image we created a noise mask for each pixel. Each
-pixel in the mast has a value of $ -1 $ with probability $ p $ and value $ 1 $
-with probability $ 1-p $. Then we do an element-wise multiplication of the 
-binary image and the noise mask. Therefore when $ p=0 $, there shouldn't be any
+pixel in the mask has a value of $ -1 $ with probability $ p $ and value $ 1 $
+with probability $ 1-p $. For the final noisy image,  we do an 
+element-wise multiplication of the binary image and the noise mask. 
+Therefore when $ p=0 $, there shouldn't be any
 distortion in the image whereas for $ p=1 $ every bit should be flipped but 
 there won't be any change in the structure. For $ p=0.5 $, the maximum noise
 will be obtained and the image will be completely distorted. We can see these
 effects in Fig. \ref{fig:noise_level}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{noise}
   \caption{Different noise levels along with the final masked images}
@@ -75,7 +78,7 @@ effects in Fig. \ref{fig:noise_level}.
 We tried to run our Boltzmann machine on varying levels of noise and computed
 the accuracy of our model.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{noise_vs_acc}
   \caption{Accuracy of the model with varying noise level}
@@ -85,7 +88,7 @@ the accuracy of our model.
 There are 3 main features of the graph:
 \begin{enumerate}
 
-  \item \textbf {Low accuracy at low noise levels} \break
+  \item \textbf {Low accuracy at low noise levels}:
     In Fig. \ref{fig:noise_vs_acc}, we can see that for very low levels of noise 
     (around 0.00 - 0.03) we have an accuracy of around $ 0.1 $ which is 
     equivalent to random guessing. This low accuracy can be explained by the 
@@ -94,18 +97,18 @@ There are 3 main features of the graph:
     be off in almost all the images. And these constant pixels makes the matrix
     $ C $ approach towards singularity resulting in low accuracy.
 
-  \item \textbf{Highest accuracy at around noise level of 0.1} \break
+  \item \textbf{Highest accuracy at around noise level of 0.1}:
     The accuracy of the model starts increasing at around $ p=0.04 $, gets 
     around $ 0.9 $ accuracy for $ p \approx 0.5 $ reaching the maximum at 
     $ p \approx 0.1 $ and the gradually decrease as we increase the noise
     level in the data.
 
-  \item \textbf{Dip at $ p=0.47 $ and accuracy of $ 0.1 $ at $ p=0.5 $} \break
+  \item \textbf{Dip at $ p=0.47 $ and accuracy of $ 0.1 $ at $ p=0.5 $}:
     We see a dip in the accuracy value at $ p=0.47 $ where it is almost $ 0 $.
     We coudn't find any good possible explanation for this behaviour. For 
-    $ p = 0.5 $ we again get an accuracy of $ 0.1 $. This behaviour can be 
-    explained since our images are completely distored now, the model's 
-    performace is equivalent to random guessing.
+    $ p = 0.5 $ we again see an accuracy of $ 0.1 $. This happens because the 
+    images are now completely distroted and the classifier's performance is
+    now equivalent to random guessing.
 
 \end{enumerate}
 
@@ -165,9 +168,24 @@ Mean Field theory for approximating the free statistics.
     The other approach for approximating the probability distribution is to 
     use Mean Field Theory. As we saw earlier the problem in computing the probability 
     distribution was to compute $ Z $. We can use Mean Field to approximate the
-    value of $ Z $. 
+    value of $ Z $ which is given by:
+
+    $$ Z = e^{-F(m)} $$
+    where
+    $$ F(m) = - \sum_{ij} w_{ij} m_i m_j - \sum_{i} h_i m_i + \sum_{i} \frac{1}{2}
+    \left ( (1+m_i) \log \frac{1}{2} (1 + m_i) + (1-m_i) \log \frac{1}{2} (1-m_i) \right) $$
+    
 
 \end{enumerate}
+As expected the Mean Field Approximation is much faster than Gibbs Sampling.
+Average run time for training using Gibbs Sampling took 18.4 seconds whereas
+Mean Field Approximation took only 1.84 seconds. Also the accuracy of our
+classifier was slightly higher in the case of Gibbs Sampling compared to Mean
+Field Approximation. We got an accuracy of $ 95.6% $ using Mean Field Approx.
+compared to around $ 97% $ in case of sampling.
+Also in the case of Sampling Approximation, we have 2 extra parameters: the 
+burn-in period and the number of samples to use. This gives us more control on 
+how accurate do we want our approximation to be.
 
 \begin{figure}[ht]
   \centering
@@ -178,15 +196,15 @@ Mean Field theory for approximating the free statistics.
 
 \section{Conclusion}
 We were able to get a good accuracy for classification using the Boltzmann 
-Machine. The accuracy score using the sampling method was slightly higher than
-what we got using the mean field approximation. Our classifier was slightly 
-confused in a few cases like between 8 and 5, 3 and 5 as we can see in Fig. 
+Machine. Our classifier was slightly confused in a few cases like between 
+8 and 5, 3 and 5 as we can see in Fig. 
 \ref{fig:confusion}. This happens because the pattern for these digits are 
 similar and should be avoidable using some preprocessing steps like rotation
-of images. Also as expected the Mean Field Approximation is computationally 
-much cheaper than Gibbs Sampling. Training using Mean Field took an average of
-1.84 seconds whereas Gibbs sampling took an average of 18.4 sec.
+of images. We can also have more complex Boltzmann Machines for this problem 
+by using hidden variables in the model. Having a more complexer model might
+increase the accuracy but will also be more susceptible to overfitting.
 
 \section{Appendix}
-
+\subsection{Code} 
+\inputminted{python}{code.py}
 \end{document}
