@@ -7,28 +7,23 @@
 \author{Zhuoran Liu}
 \title{Multi-Layer Perceptron}
 
-% Set all of these to false for the final document
-\newif\ifrequirements
-\requirementstrue
-%\requirementsfalse
 
 \begin{document}
 \maketitle
 
-\ifrequirements
-\color{red}
-\textbf{Document requirements shown by flag \texttt{requirementstrue}.}
-\textbf{Set flag \texttt{requirementsfalse}.}
-
-\color{blue}
-
 \color{black}
-\fi
-
 \newpage
 \section{Introduction}
-
-
+In this report, we will consider the neural network multi-layer perceptron. Multi-layer perceptron is a neural network with multiple hidden layers and in each hidden layer there are multiple neurons. Between different neurons in adjacent layers, there exist weights to connect different neurons. In every hidden layer, there exist biases to tune some outcomes of neurons. The aim of training the network is to find the proper weights and biases which can be used to predict the new data.
+\subsection{Underlying Theory}
+Firstly, we will talk about the working mechanism of the MLP. Given the neural network structure(weights matrix $W$ and biases vector $b$) and input data vector $a$, we can calculate the feed forward process by formula
+\[\textbf{z} = g(\textbf{w}a + \textbf{b})\]
+Here $g$ is the activation function and output $z$ is a vector. Use $z$ as the input of the next layer, we can do similar calculation again until we get the output. Given the last output $z$, we will calculate the $argmax(z)$. The category of the $argmax(z)$ is the predication of the input $a$. Known the right category, we will tune the weights and biases to predict better and better. This is the learning process of MLP. 
+Given the input 
+\subsection{Learning Algorithm}
+Backpropagation algorithm is the learning algorithm we will use. It consists of 4 steps.
+\[\delta_{j}^{L} = \frac{\partial C}{\partial{a_{j}}^{L}} \sigma'(z_{j}^{L})\]
+\newpage
 \section{Problem statement}
 
 \section{Results}
