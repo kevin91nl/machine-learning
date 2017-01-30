@@ -2,7 +2,7 @@
 % minimize E= 0.5 x^T w x, with x=x_1,...,x_n and x_i=0,1
 % w is a symmetric real n x n matrix with zero diagonal
 
-METHOD='iter';
+METHOD='sa';
 NEIGHBORHOODSIZE=3;
 n_restart = 1;
 
