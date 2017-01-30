@@ -109,6 +109,21 @@ There are 3 main features of the graph:
 
 \end{enumerate}
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{sampling}
+  \caption{Absolute change in weight with iteration}
+  \label{fig:sampling}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{sampling_grid}
+  \caption{Variation of slope for different values of used samples and burn in 
+  samples}
+  \label{fig:sampling_grid}
+\end{figure}
+
 \subsection{Comparision of Sampling Methods and Mean Field Approximation}
 For learning a Boltzmann machine we need to compare the free and the clamped
 statistics. The probability distribution represented by a Boltzmann machine
@@ -141,32 +156,36 @@ Mean Field theory for approximating the free statistics.
 
     For comparing the rate of convergence, we fitted a straight line to the 
     absolute change in weights with number of iterations as shown in Fig. 
-    \ref{fig:sampling}. We also plotted a grid (Fig. \ref{sampling_grid}) for 
+    \ref{fig:sampling}. We also plotted a grid (Fig. \ref{fig:sampling_grid}) for 
     value of slope for different values of burn-in samples and number of used
     samples.
 
 
   \item \textbf{Approximating using Mean Field Theory}
-    TODO: Mean Field theory
+    The other approach for approximating the probability distribution is to 
+    use Mean Field Theory. As we saw earlier the problem in computing the probability 
+    distribution was to compute $ Z $. We can use Mean Field to approximate the
+    value of $ Z $. 
 
 \end{enumerate}
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{sampling}
-  \caption{Absolute change in weight with iteration}
-  \label{fig:noise_vs_acc}
-\end{figure}
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=\textwidth]{sampling_grid}
-  \caption{Variation of slope for different values of used samples and burn in 
-  samples}
-  \label{fig:noise_vs_acc}
+  \includegraphics[width=\textwidth]{confusion}
+  \caption{Confusion Matrix for classifying all the 10 digits}
+  \label{fig:confusion}
 \end{figure}
 
 \section{Conclusion}
+We were able to get a good accuracy for classification using the Boltzmann 
+Machine. The accuracy score using the sampling method was slightly higher than
+what we got using the mean field approximation. Our classifier was slightly 
+confused in a few cases like between 8 and 5, 3 and 5 as we can see in Fig. 
+\ref{fig:confusion}. This happens because the pattern for these digits are 
+similar and should be avoidable using some preprocessing steps like rotation
+of images. Also as expected the Mean Field Approximation is computationally 
+much cheaper than Gibbs Sampling. Training using Mean Field took an average of
+1.84 seconds whereas Gibbs sampling took an average of 18.4 sec.
 
 \section{Appendix}
 
