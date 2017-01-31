@@ -4,8 +4,9 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{color}
-\author{K.M.J. Jacobs}
-\title{Path Integral Control Theory}
+\usepackage{graphicx}
+\author{K.M.J. Jacobs (s4134621) \and Zhuoran Liu (s4594851) \and Ankur Ankan (s4753828)}
+\title{Simulated Annealing}
 
 % Set all of these to false for the final document
 \newif\ifrequirements
@@ -64,6 +65,43 @@ In frustrated situation, it is not easy to get the minimal energy.
 We firstly did experiments with restart number $100000$, it will take on average $10$ seconds. The minimal energy is more or less $-736$, but we got it ranges from $-736$ to $-586$ in $5$ times experiments.\\
 Then we changes the restart number to $1000000$. It costed $95$ seconds, and got results ranged from $-704$ to $-644$ . It ranges less, but also didn't yield nice results. \\
 When increase the restarts to $10000000$, it will take $998$ seconds and still didn't give a good result.
+
+\subsection{Exercise 2.1}
+\subsubsection{Plot reconstruction for $n=50$}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{../sa/sa_frustrated.png}
+\caption{Simulated Annealing in which $1000$ samples are generated at each temperature using Metropolis-Hasting with $\beta_0=\frac{1}{\max(dE)}$ and $\beta_{t+1} = \beta_t \cdot 1.05$ for a frustrated system with $n=50$.}
+\label{fig:sa_frustrated}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{../sa/sa_ferromagnetic.png}
+\caption{Simulated Annealing in which $1000$ samples are generated at each temperature using Metropolis-Hasting with $\beta_0=\frac{1}{\max(dE)}$ and $\beta_{t+1} = \beta_t \cdot 1.05$ for a ferromagnetic system with $n=50$.}
+\label{fig:sa_ferromagnetic}
+\end{figure}
+
+In figure \ref{fig:sa_frustrated}, the resulting plots are shown when simulated annealing is applied on a problem with $n=50$ in the case that the system is frustrated.
+
+In figure \ref{fig:sa_ferromagnetic}, the resulting plots are shown when simulated annealing is applied on a problem with $n=50$ in the case that the system is ferromagnetic.
+
+\subsubsection{Choice of $\beta$ and \texttt{factor}}
+
+\begin{align}
+p(x) = \frac{\exp(-\beta E(x))}{Z}
+\label{eq:sa_p}
+\end{align}
+
+In equation \ref{eq:sa_p}, the definition of the probability distribution of a state $x$ is shown. If you take $\beta \rightarrow \infty$, then $p(x) \rightarrow 0$ and all states are assigned approximately equal probability. By that, the sampling procedure can get stuck in any state if there are no neighbours with higher probability. Since the probabilities are approximately equal, it is very hard to find any better neighbours. When we ran an experiment with $\beta \approx 1000$ we found indeed that there were only a few number of iterations ($< 10$) which is caused by the fact that it gets stuck in a particular state. Also, the probability that the final state is a global optimum is extremely low.
+
+The lower the choice for $\beta$, the more samples are accepted during the sampling procedure. This will result in a better final state and a better approximation for the minimum energy. Because more samples are accepted, it will take a longer time to finish the simulation.
+
+In conclusion, smaller $beta$ ($beta \rightarrow 0$) will result in better results but it takes a longer time to finish the simulation.
+
+The \texttt{factor} variable defines how $\beta$ is increased at each timestep (since $\beta_{t + 1} = \beta_t \cdot \texttt{factor}$). The more $\texttt{factor} \rightarrow 1$, the more slowly $\beta$ grows and therefore the more time it takes for the sampling procedure. The larger $\texttt{factor}$, the less time it takes, but the results get worse.
+
+\subsubsection{Choice of \texttt{factor}}
 
 \section{Discussion}
 
