@@ -1,5 +1,5 @@
 rand('state',0)
-n=4;
+n=200;
 p=n;
 w=sprandsym(n,p);
 w=(w>0)-(w<0); % this choice defines a frustrated system

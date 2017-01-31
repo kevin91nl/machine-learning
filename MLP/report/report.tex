@@ -4,7 +4,8 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{color}
-\author{Zhuoran Liu}
+\usepackage{listings}
+\author{K.M.J. Jacobs (s4134621) \and Zhuoran Liu (s4594851) \and Ankur Ankan (s4753828) \and Code file: MNIST.ipynb}
 \title{Multi-Layer Perceptron}
 \usepackage{graphicx}
 
@@ -62,8 +63,7 @@ We also need to consider the running time of different cases. In figure 2, it is
 The second problem to investigate is the influence on classification accuracies from the number of hidden layers. We did the experiment with five different settings. The settings of hidden layer number ranges from $1$ to $5$, and in each hidden layer we used $5$ neurons. All five experiments used same input layer ($784$) and output layer, and used same epoches ($100$), same learning rate ($0.05$) and same mini-batch number ($10$). The figure 3 and figure 4 showed the results of five different settings.\\
 \begin{figure}
 \centering
-\includegraphics[width=60mm,scale=1]{p103.jpg}
-\includegraphics[width=60mm,scale=1]{p107.jpg}
+\includegraphics[width=90mm,scale=1]{p103.jpg}
 \caption{Different learning accuracies by different setting of layer numbers}
 \end{figure}
 
@@ -73,9 +73,8 @@ The second problem to investigate is the influence on classification accuracies 
 \caption{Different learning time by different setting of layer numbers}
 \end{figure}
 
-From figure 3 left side, we can see that more hidden layers had a bad performance after layers' amout $3$. It increased a little bit from layer number $1$ to $3$, then dropped after $3$.\\
-In figure 3 right side, we plotted the accuracies change between $5$ hidden layers with test set and $5$ hidden layers with part of training set. Here the plot means there exist a over-fitting problem. Since for training data (red line), it is fine. But for test data. it is not good. The right side plot is not like this every training time, but it often happens.
-%The other experiments almost performed the same. This problem may be caused by the training data. Since we just need to classify number $3$ and number $7$, so no more complicated model should be trained. So more layers didn't perform better.\\
+From figure 3, we can see that more hidden layers had a bad performance after layers' amout $3$. It increased a little bit from layer number $1$ to $3$, then dropped after $3$.\\
+The other experiments almost performed much better This problem may be caused by the training data. Since we just need to classify number $3$ and number $7$, so no more complicated model should be trained. So more layers didn't perform better. But this is no the general case.\\
 
 
 More layers will take more training time, and the relationship between layers' number and time is also almost linear. The figure 4 is the running time of the five experiments we mentioned above. This relationship may not be the same, when we have more neurons in every layer and when we have more layers. It will be like exponential time, but not really. Since all the calculations are linear.\\
@@ -108,7 +107,7 @@ From figure 6 left side, we can see that sigmoid did better. Here should not be 
 Momentum is a method to escape from local minimum, and it did speed up the learning process by changing gradient direction more straight forward to the target. We used two formulas to implement the momentum learning.
 \[v' = \mu v - \eta \nabla C\]
 \[w' = w + v'\]
-After implementation we got the results compared with stochastic gradient method as below. In figure 7, red line showed the process of stochastic gradient descent and blue line showed the process of momentum. The momentum convergence faster than SGD. Since it changed more in every step than SGD, it fluctuated a little bit. \\
+After implementation we got the results compared with stochastic gradient method as below. In figure 7, red line showed the process of stochastic gradient descent and blue line showed the process of momentum. The momentum convergence faster than SGD. Since it changed more in every step than SGD, it fluctuated a little bit. From this figure it is not very obvious, but momentum method is more stable than SGD.\\
 \begin{figure}
 \centering
 \includegraphics[width=75mm,scale=1]{p401.jpg}\\
@@ -121,4 +120,360 @@ From what we have explored, more hidden layers and more neurons involved may hav
 
 \newpage
 \section{Appendix}
+\subsection{Load, reshape and transform the raw data to training set with $3$ and $7$}
+\begin{lstlisting}[language=Python]
+import numpy as np
+np.set_printoptions(threshold=np.nan)
+import scipy.io
+import scipy
+import random
+
+
+class DataLoader:
+    '''
+    For load data and change shape to (x,y). x is the traing images and y is the label of the x.
+    '''
+
+    def __init__(self, file):
+
+        self.data = scipy.io.loadmat(file, squeeze_me=True, struct_as_record=False)['mnist']
+        self.train_images = self.data.train_images
+        self.test_images = self.data.test_images
+        self.train_labels = self.data.train_labels
+        self.test_labels = self.data.test_labels
+
+        # transform the raw data to binary data
+        self.train_images = self.transform_images(self.train_images)
+        self.test_images = self.transform_images(self.test_images)
+
+        # reshape the training images to [784,1]
+        self.train_images = [np.reshape(x, (784, 1)) for x in self.train_images]
+        self.test_images = [np.reshape(x, (784, 1)) for x in self.test_images]
+
+        labels = np.asarray(self.train_labels)
+        selector = (labels == 3) | (labels == 7)
+        self.train_labels = self.train_labels[selector]
+        self.train_images = np.array(self.train_images)
+        self.train_images = self.train_images[selector]
+        ls= []
+        for i in self.train_labels:
+            if i == 3:
+                ls.append([[1.],[0.]])
+            else:
+                ls.append([[0.],[1.]])
+        self.train_labels = ls
+        
+        self.training_data = tuple(zip(self.train_images, self.train_labels))
+        
+#       test part
+        labels = np.asarray(self.test_labels)
+        selector = (labels == 3) | (labels == 7)
+        self.test_labels = self.test_labels[selector]
+        self.test_images = np.array(self.test_images)
+        self.test_images = self.test_images[selector]
+        ls= []
+        for i in self.test_labels:
+            if i == 3:
+                ls.append([[1.],[0.]])
+            else:
+                ls.append([[0.],[1.]])
+        self.test_labels = ls
+        
+        self.test_data = tuple(zip(self.test_images, self.test_labels))
+        
+        
+    # function to reshape
+    def transform_images(self, data):
+
+        reshaped = data.reshape(data.shape[0] * data.shape[1], data.shape[2])
+        swapped_axes = np.swapaxes(reshaped, 0, 1)
+        return swapped_axes * (1.0/256)
+#         return (swapped_axes > 122) * 2.0 - 1
+\end{lstlisting}
+\subsection{Main part of Network and Backpropagation}
+\begin{lstlisting}[language=Python]
+data = DataLoader('mnistALL.mat')
+class Network(object):
+
+    def __init__(self, sizes):
+        '''
+        sizes is the structure of the whole network shown by [first layer, second layer, ... , last year] as a list
+        different waies to initialize the weights and biases
+        '''
+        self.num_layers = len(sizes)
+        self.sizes = sizes
+#       the initialization of the weights and biases
+        self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
+        self.weights = [np.random.randn(y, x)
+                        for x, y in zip(sizes[:-1], sizes[1:])]
+
+    # the feedward calculation of the network, which will return the result to the last layer
+    def feedforward(self, a):
+        for b, w in zip(self.biases, self.weights):
+            a = sigmoid(np.dot(w, a)+b)
+        return a
+    # stochastic gradient descent process, with training_data shaped like (x,y), x is the traing data,
+#     and y is the target value. lr is the learning rate and mini_batch_size is mini batch size. test_data
+#  is the part for validation
+    def StochasticGradientDescent(self, training_data, epochs, mini_batch_size, lr,
+            test_data=None):
+        error = []
+        if test_data: n_test = len(test_data)
+        n = len(training_data)
+        for j in xrange(epochs):
+# shuffle command for shuffle the data set
+            random.shuffle(list(training_data))
+# here is the mini batches to train every time after shuffle the whole training set
+            mini_batches = [
+                training_data[k:k+mini_batch_size]
+                for k in xrange(0, n, mini_batch_size)]
+# here is to test the validation percentage of the model
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, lr)
+            if test_data:
+                error.append(self.evaluate(test_data)/(len(test_data) * 1.0))
+                print "Epoch {0}: {1} / {2}".format(
+                    j, self.evaluate(test_data), n_test)
+                
+            else:
+                print "complete"
+        return error
+# this function is to update the weights and biases after mini batches
+    def update_mini_batch(self, mini_batch, lr):
+# initialization the nabla
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        for x, y in mini_batch:
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+# here got updated by backpropagate
+            nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
+            nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+# did the update
+        self.weights = [w-(lr/len(mini_batch))*nw
+                        for w, nw in zip(self.weights, nabla_w)]
+        self.biases = [b-(lr/len(mini_batch))*nb
+                       for b, nb in zip(self.biases, nabla_b)]
+# here is the specific backpropagate function
+    def backprop(self, x, y):
+
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        activation = x
+        activations = [x] 
+        zs = [] 
+        # list to store all the z vectors, layer by layer
+        for b, w in zip(self.biases, self.weights):
+            z = np.dot(w, activation)+b
+            zs.append(z)
+#         here the activation function is sigmoid
+            activation = sigmoid(z)
+            activations.append(activation)
+        # this is the delta back pass to update
+        delta = self.cost_derivative(activations[-1], y) * \
+            sigmoid_derive(zs[-1])
+        nabla_b[-1] = delta
+        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+        
+        for l in xrange(2, self.num_layers):
+            z = zs[-l]
+            sp = sigmoid_derive(z)
+            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+            nabla_b[-l] = delta
+            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
+#         got the final nablas for weights and biases
+        return (nabla_b, nabla_w)
+# here evaluate the whole correctness of the training samples
+    def evaluate(self, test_data):
+        test_results = [(np.argmax(self.feedforward(x)), np.argmax(y))
+                        for (x, y) in test_data]
+        return sum(int(x == y) for (x, y) in test_results)
+
+    def cost_derivative(self, output_activations, y):
+        return (output_activations-y)
+#  sigmoid function
+def sigmoid(z):
+    return 1.0/(1.0+np.exp(-z))
+
+# derivative of sigmoid function
+def sigmoid_derive(z):
+    return sigmoid(z)*(1-sigmoid(z))
+
+\end{lstlisting}
+\subsection{Better initialization for sigmoid function}
+\begin{lstlisting}[language=Python]
+ self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+        self.weights = [np.random.randn(y, x)/np.sqrt(x)
+                        for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+\end{lstlisting}
+
+\subsection{tanh function and its initialization}
+\begin{lstlisting}
+self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+self.weights = [np.random.randn(y, x)/np.sqrt(x)*4
+                        for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+
+def tanh(x):
+    return np.tanh(x)
+
+def tanh_prime(x):
+    return 1.0 - np.tanh(x)**2
+\end{lstlisting}
+
+\subsection{Momentum learning}
+\begin{lstlisting}[language=Python]
+class Network(object):
+
+    def __init__(self, sizes,mu):
+        '''
+        sizes is the structure of the whole network shown by [first layer, second layer, ... , last year] as a list
+        different waies to initialize the weights and biases
+        '''
+        self.num_layers = len(sizes)
+        self.sizes = sizes
+        self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
+        self.weights = [np.random.randn(y, x)
+                        for x, y in zip(sizes[:-1], sizes[1:])]
+#     initialization of momentum
+        self.vb = [np.zeros(b.shape) for b in self.biases]
+        self.vw = [np.zeros(w.shape) for w in self.weights]
+        self.mu = mu
+
+# the feedward calculation of the network, which will return the result to the last layer
+    def feedforward(self, a):
+        for b, w in zip(self.biases, self.weights):
+            a = sigmoid(np.dot(w, a)+b)
+        return a
+# stochastic gradient descent process, with training_data shaped like (x,y), x is the traing data,
+#     and y is the target value. lr is the learning rate and mini_batch_size is mini batch size. test_data
+#  is the part for validation
+    def Momentum(self, training_data, epochs, mini_batch_size, lr,
+            test_data=None):
+        error = []
+        if test_data: n_test = len(test_data)
+        n = len(training_data)
+        for j in xrange(epochs):
+# shuffle command for shuffle the data set
+            random.shuffle(list(training_data))
+# here is the mini batches to train every time after shuffle the whole training set
+            mini_batches = [
+                training_data[k:k+mini_batch_size]
+                for k in xrange(0, n, mini_batch_size)]
+# here is to test the validation percentage of the model
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, lr)
+            if test_data:
+                error.append(self.evaluate(test_data)/(len(test_data) * 1.0))
+                print "Epoch {0}: {1} / {2}".format(
+                    j, self.evaluate(test_data), n_test)
+                
+            else:
+                print "complete"
+        return error
+# this function is to update the weights and biases after mini batches
+    def update_mini_batch(self, mini_batch, lr):
+# initialization the nabla
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        for x, y in mini_batch:
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+            self.vb = [self.mu * vb - lr * db/len(mini_batch) 
+                       for vb,db in zip(self.vb, delta_nabla_b)]
+            self.vw = [self.mu * vw - lr * dw/len(mini_batch) 
+                       for vw,dw in zip(self.vw, delta_nabla_w)]
+            self.weights = [w + vw for w, vw in zip(self.weights, self.vw)]
+            self.biases = [b + vb for b, vb in zip(self.biases, self.vb)]
+# here is the specific backpropagate function
+    def backprop(self, x, y):
+
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        activation = x
+        activations = [x] 
+        zs = [] 
+        # list to store all the z vectors, layer by layer
+        for b, w in zip(self.biases, self.weights):
+            z = np.dot(w, activation)+b
+            zs.append(z)
+#         here the activation function is sigmoid
+            activation = sigmoid(z)
+            activations.append(activation)
+        # this is the delta back pass to update
+        delta = self.cost_derivative(activations[-1], y) * \
+            sigmoid_derive(zs[-1])
+        nabla_b[-1] = delta
+        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+        
+        for l in xrange(2, self.num_layers):
+            z = zs[-l]
+            sp = sigmoid_derive(z)
+            delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
+            nabla_b[-l] = delta
+            nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
+#         got the final nablas for weights and biases
+        return (nabla_b, nabla_w)
+# here evaluate the whole correctness of the training samples
+    def evaluate(self, test_data):
+        test_results = [(np.argmax(self.feedforward(x)), np.argmax(y))
+                        for (x, y) in test_data]
+        return sum(int(x == y) for (x, y) in test_results)
+
+    def cost_derivative(self, output_activations, y):
+        return (output_activations-y)
+#  sigmoid function
+def sigmoid(z):
+    return 1.0/(1.0+np.exp(-z))
+
+# derivative of sigmoid function
+def sigmoid_derive(z):
+    return sigmoid(z)*(1-sigmoid(z))
+\end{lstlisting}
+
+\subsection{Data load and train and test with a 3 layer network(10,10,5) by StochasticGradientDescent}
+\begin{lstlisting}[language=Python]
+training_data = data.training_data
+validation_data = data.test_data
+]
+net = Network([784,10,10,5,2])
+error = net.StochasticGradientDescent(training_data, 100, 10, 0.001, test_data=validation_data)
+
+\end{lstlisting}
+\subsection{Plot setting}
+\begin{lstlisting}[language=Python]
+%matplotlib inline
+
+import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.ticker import FuncFormatter
+
+def to_percent(y, position):
+    # Ignore the passed in position. This has the effect of scaling the default
+    # tick locations.
+    s = str(100 * y)
+
+    # The percent symbol needs escaping in latex
+    if matplotlib.rcParams['text.usetex'] is True:
+        return s + r'$\%$'
+    else:
+        return s + '%'
+formatter = FuncFormatter(to_percent)
+\end{lstlisting}
+\begin{lstlisting}[language=Python]
+epoches = range(len(error))
+plt.plot(epoches, error1,'b')
+
+
+plt.title('Plotexample')
+plt.xlabel('epoches')# make axis labels
+plt.ylabel('accuracies')
+
+plt.xlim(0.0, 100)
+plt.ylim(0.4, 1.0)
+plt.gca().yaxis.set_major_formatter(formatter)
+
+plt.show()
+\end{lstlisting}
+
+
+
+
 \end{document}
