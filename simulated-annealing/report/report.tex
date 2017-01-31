@@ -6,8 +6,8 @@
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{listings}
-\author{K.M.J. Jacobs (s4134621) \and Zhuoran Liu (s4594851) \and Ankur Ankan (s4753828)}
-\title{Simulated Annealing}
+\author{K.M.J. Jacobs (s4134621) \and Zhuoran Liu (s4594851) \and Ankur Ankan (s4753828) \and Code file: Ising.m}
+\title{Ising Model}
 
 % Set all of these to false for the final document
 \newif\ifrequirements
@@ -49,23 +49,32 @@ The report for each exercise addresses following points:
 \fi
 
 \newpage
+\tableofcontents
+
+\newpage
 \section{Introduction}
 This work is mainly about the simulated annealing process. There are two parts in total. The first part mainly considered the iterative improvement. For both ferro-magnetic and frustrated situations, we will choose to flip $1$, $2$ or more spins to make the cost lower than before. The algorithm terminates when no improvement for any state.
 
 
 \section{Problem statement}
-1. In both ferro-magnetic and frustrated situations, how many restarts are needed for reproducible results?\\
-2. In frustrated situation, investigate the influence of neighbourhood size.
+In the first part of the assignment, we are asked to investigate in the given iterative method for both the ferromagnetic and a frustrated system.
+For the second part of the assignment, both the iterative method and simulated annealing are compared on different problems.
+
+The research questions are the following:
+\begin{enumerate}
+\item How does Simulated Annealing improve upon the Iterative method?
+\item What is the influence of different parameter settings on Simulated Annealing?
+\end{enumerate}
 
 \section{Results}
 \subsection{Exercise 1.1}
-Firstly, we did some experiments in the ferro-magnetic situation with $n=100$. Firstly, in the situation neighbourhood size is $1$, we need $436$ restarts to get the minimal energy $-2512$. When we changed the neighbourhood size to $2$, it just need $207$ restarts. Finally, we tried with neighbourhood size $3$, it just need $138$ restarts to get the minimal energy.\\
-Then, we did some experiments in the frustrated situation with $n=100$. When neighbourhood size is $1$, we did $1000000$ restarts found minimal energy is $-602$. Then we did with neighbourhood size $2$, and found minimal energy is $-736$ with $1000000$ restarts. So for the frustrated situation, it is not easy to convergence. Especially with less neighbourhood size.
+Firstly, we did some experiments in the ferro-magnetic situation with $n=100$. Firstly, in the situation neighbourhood size is $1$, we need $436$ restarts to get the minimal energy $-2512$. When we changed the neighbourhood size to $2$, it just need $207$ restarts.\\
+Then, we did some experiments in the frustrated situation with $n=100$. When neighbourhood size is $1$, we did $1.000.000$ restarts found minimal energy is $-602$. Then we did with neighbourhood size $2$, and found minimal energy is $-736$ with $1.000.000$ restarts. So for the frustrated situation, it is not easy to convergence. Especially with less neighbourhood size.
 \subsection{Exercise 1.2}
 In frustrated situation, it is not easy to get the minimal energy.
 We firstly did experiments with restart number $100000$, it will take on average $10$ seconds. The minimal energy is more or less $-736$, but we got it ranges from $-736$ to $-586$ in $5$ times experiments.\\
-Then we changes the restart number to $1000000$. It costed $95$ seconds, and got results ranged from $-704$ to $-644$ . It ranges less, but also didn't yield nice results. \\
-When increase the restarts to $10000000$, it will take $998$ seconds and still didn't give a good result.
+Then we changes the restart number to $1.000.000$. It costed $95$ seconds, and got results ranged from $-704$ to $-644$ . It ranges less, but also didn't yield nice results.\\
+When increase the restarts to $10.000.000$, it will take $998$ seconds and still didn't give a good result.
 
 \subsection{Exercise 2.1}
 \subsubsection{Plot reconstruction for $n=50$}
@@ -190,6 +199,255 @@ On both computers, we found $E_{\min} = -10080$.
 
 \section{Discussion and Conclusions}
 
+\subsection{How does Simulated Annealing improve upon the Iterative method?}
+The iterative method does get stuck in local minima easily. So in the case of a frustrated system when there are many local minima, the iterative method will not find a global solution to the problem. Simulated Annealing does find a global optimum to these problems.
+
+The running time of the iterative method and Simulated Annealing are hard to compare. For easy problems, the running time of the iterative method is approximately equal to the running time of Simulated Annealing. For hard problems, the iterative method will not converge at all for most of the problems whereas Simulated Annealing will find a solution quite fast.
+
+\subsection{What is the influence of different parameter settings on Simulated Annealing?}
+For simple problems like in the ferromagnetic case, almost any configuration of parameters will work.
+
+For harder problems like the frustrated system with large $n$, parameters $\beta \rightarrow 0$ and $\beta > 0$ and a $\texttt{factor}$ close and strictly larger than $1$ and $T_1 \rightarrow \infty$ are giving good results.
+
 \newpage
 \section{Appendix}
+
+\subsection{Generation of a binary symmetric random matrix}
+\begin{lstlisting}[language=Matlab]
+rand('state',0)
+n=50;
+p=n;
+w=sprandsym(n,p);
+%w=(w>0)-(w<0); % this choice defines a frustrated system
+w=(w>0); % this choice defines a ferro-magnetic (easy) system
+w=w-diag(diag(w));
+\end{lstlisting}
+
+\subsection{Both the iterative method and Simulated Annealing}
+\begin{lstlisting}[language=Matlab]
+% problem definition
+% minimize E= 0.5 x^T w x, with x=x_1,...,x_n and x_i=0,1
+% w is a symmetric real n x n matrix with zero diagonal
+
+METHOD='sa';
+NEIGHBORHOODSIZE=1;
+n_restart =100;
+
+switch METHOD,
+case 'iter'
+
+	E_min = 10000;
+    x = 2*(rand(1,n)>0.5)-1;
+	for t=1:n_restart,
+
+		% initialize
+		E1 = E(x,w);
+		flag = 1;
+	
+		while flag == 1,
+			flag = 0;
+			switch NEIGHBORHOODSIZE,
+			case 1,
+				% choose new x by flipping one bit i
+				% compute dE directly instead of subtracting E's of
+				% different states because of efficiency
+                bit = randi([1, numel(x)]);
+                x_new = x;
+                x_new(bit) = x_new(bit) * -1;
+                E2 = E(x_new,w);
+                % Check whether the new energy is smaller than the old
+                % energy and update the 'best' state
+                if E2 < E1
+                    x = x_new;
+                    E1 = E2;
+                    flag = 1;
+                    break;
+                end
+			case 2,
+				% choose new x by flipping bits i,j
+                bit1 = randi([1, numel(x)]);
+                bit2 = randi([1, numel(x)]);
+                while bit2 == bit1
+                    bit2 = randi([1, numel(x)]);
+                end
+                % Make 3 states and check whether the energy decreases
+                x_new1 = x;
+                x_new2 = x;
+                x_new3 = x;
+                x_new1(bit1) = x_new1(bit1) * -1;
+                x_new2(bit2) = x_new2(bit2) * -1;
+                x_new3(bit1) = x_new3(bit1) * -1;
+                x_new3(bit2) = x_new3(bit2) * -1;
+                E_new1 = E(x_new1,w);
+                E_new2 = E(x_new2,w);
+                E_new3 = E(x_new3,w);
+                
+                % Check if the energy of the state in which the first bit
+                % is flipped is the best neighbour in terms of energy
+                if E_new1 < E1 & E_new1 < E_new2 & E_new1 < E_new3
+                    x = x_new1;
+                    E1 = E_new1;
+                    flag = 1;
+                end
+                
+                % Check if the energy of the state in which the second bit
+                % is flipped is the best neighbour in terms of energy
+                if E_new2 < E1 & E_new2 < E_new1 & E_new2 < E_new3
+                    x = x_new2;
+                    E1 = E_new2;
+                    flag = 1;
+                    break;
+                end
+                
+                % Check if the energy of the state in which both bits are
+                % flipped is the best neighbour in terms of energy
+                if E_new3 < E1 & E_new3 < E_new1 & E_new3 < E_new2
+                    x = x_new3;
+                    E1 = E_new3;
+                    flag = 1;
+                    break;
+                end
+            end;
+		end;
+		E_min = min(E_min,E1);
+	end;
+	E_min
+case 'sa'
+	% initialize
+	x = 2*(rand(1,n)>0.5)-1;
+	E1 = E(x,w);
+	E_outer=zeros(1,100);	%stores mean energy at each temperature
+	E_bar=zeros(1,100);		% stores std energy at each temperature
+
+	% initialize temperature
+	max_dE=0;
+    x_old = x;
+    
+    % Estimate the maximum change of energy by taking random samples and
+    % take one random neighbour and compare the energies
+	switch NEIGHBORHOODSIZE,
+        case 1,
+			% estimate maximum dE in single spin flip
+            for round = 1:10000
+                x_1 = 2*(rand(1,n)>0.5)-1;
+                bit = randi(1, n);
+                x_2 = x_1;
+                x_2(bit) = x_2(bit) * -1;
+                dE = E(x_2, w) - E(x_1, w);
+                max_dE = max(max_dE, dE);
+            end
+        case 2,
+			% estimate maximum dE in pair spin flip
+        end;
+        
+	beta_init=1/max_dE;	% sets initial temperature
+    
+    %beta_init = 0.1;
+    
+	T1=1000; % length markov chain at fixed temperature
+	factor=1.05 ; % increment of beta at each new chain
+    
+    beta_init = 2;
+    factor = 2;
+    T_1=1000;
+    
+	beta=beta_init;
+	E_bar(1)=1;
+	t2=0;
+	while t2 == 0 | E_bar(t2) > 0,
+        t2=t2+1;
+		beta=beta*factor;
+		E_all=zeros(1,T1);
+		for t1=1:T1,
+			switch NEIGHBORHOODSIZE,
+			case 1,
+				% choose new x by flipping one random bit i
+				% perform Metropolis Hasting step
+                bit = randi(n, 1);
+                x_new = x;
+                x_new(bit) = x_new(bit) * -1;
+                E2 = E(x_new,w);
+                dE = E2 - E1;
+                a = exp(-dE * beta);
+                a = min(1, a);
+                if a > rand()
+                    x = x_new;
+                    E1 = E2;
+                end
+                E_all(1,t1) = E1;
+			case 2,
+				% choose new x by flipping random bits i,j
+				% perform Metropolis Hasting step
+                bit1 = randi(n, 1);
+                bit2 = bit1;
+                
+                % Choose a second bit which is unequal to the first bit
+                while bit2 == bit1
+                    bit2 = randi(n, 1);
+                end
+                
+                % Compute the proposed states
+                x_new = x;
+                x_new(bit1) = x_new(bit1) * -1;
+                x_new(bit2) = x_new(bit2) * -1;
+                
+                % First check for the state in which both bits are flipped
+                E2 = E(x_new, w);
+                dE = E2 - E1;
+                a = exp(-dE * beta);
+                a = min(1, a);
+                if a > rand()
+                    x = x_new;
+                    E1 = E2;
+                else
+                    % Then check for the state in which only the first bit is
+                    % flipped
+                    x_new = x;
+                    x_new(bit1) = x_new(bit1) * -1;
+                    E2 = E(x_new, w);
+                    dE = E2 - E1;
+                    a = exp(-dE * beta);
+                    a = min(1, a);
+                    if a > rand()
+                        x = x_new;
+                        E1 = E2;
+                    else
+                        % Finally check for the state in which only the
+                        % second bit is flipped
+                        x_new = x;
+                        x_new(bit1) = x_new(bit1) * -1;
+                        E2 = E(x_new, w);
+                        dE = E2 - E1;
+                        a = exp(-dE * beta);
+                        a = min(1, a);
+                        if a > rand()
+                            x = x_new;
+                            E1 = E2;
+                        end
+                    end
+                end
+                E_all(1,t1) = E1;
+			end;
+			% E1 is energy of new state
+			E_all(t1)=E1;
+		end;
+		E_outer(t2)=mean(E_all);
+		E_bar(t2)=std(E_all);
+		[t2 beta E_outer(t2) E_bar(t2)] % observe convergence
+	end;
+	E_min=E_all(1) % minimal energy 
+end;
+
+subplot(1, 2, 1);
+plot(1:t2,E_outer(1:t2))
+xlabel('Iterations');
+ylabel('Energy');
+title('Mean energy');
+
+subplot(1, 2, 2);
+plot(1:t2,E_bar(1:t2))
+xlabel('Iterations');
+ylabel('Energy');
+title('Energy standard deviation');
+\end{lstlisting}
 \end{document}
