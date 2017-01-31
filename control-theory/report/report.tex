@@ -5,13 +5,13 @@
 \usepackage{amssymb}
 \usepackage{color}
 \usepackage{graphicx}
-\author{K.M.J. Jacobs (s4134621) \and Zhuoran Liu (s4594851) \and Ankur Ankan (s4753828)}
+\author{K.M.J. Jacobs (s4134621) \and Zhuoran Liu (s4594851) \and Ankur Ankan (s4753828) \and Code file: Control.\{ipynb,m\}}
 \title{Stochastic Optimal Control}
 
 % Set all of these to false for the final document
 \newif\ifrequirements
 \requirementstrue
-%\requirementsfalse
+\requirementsfalse
 
 \usepackage{listings}
 
@@ -140,14 +140,14 @@ First, it is easy to gain some insights by plotting the graph for the hill $L(x)
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=150px]{lx.png}
+\includegraphics[width=100px]{lx.png}
 \caption{The plot of the hill $L(x)$.}
 \label{fig:mcp-fgx}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=150px]{fgx.png}
+\includegraphics[width=100px]{fgx.png}
 \caption{The gravitational force $F_g(x)$ for $g=-9.81$.}
 \label{fig:mcp-fgx}
 \end{figure}
@@ -172,7 +172,7 @@ In figures \ref{fig:mcp-g10} and \ref{fig:mcp-g0}, it can be seen that $g \neq 0
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=150px]{J.png}
+\includegraphics[width=80px]{J.png}
 \caption{The optimal cost-to-go at $t=0$, $\nu=4$, $g=-10$ and without control (so $u=0$) computed by calculating $100$ simulations per $(x_0, v_0)$ pair.}
 \label{fig:mcp-j}
 \end{figure}
@@ -191,14 +191,14 @@ It is computed by generating $N$ trajectories $x_{t:T}^\mu$ starting at $(x, v, 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=300px]{f1.png}
+\includegraphics[width=200px]{f1.png}
 \caption{$100$ simulations without control (so $u=0$) with $(x_0, v_0) = (0, 0)$, $A=-1$, $R=1$, $\nu=0.2$, $T=5$, $g=-10$ and $dt=0.25$.}
 \label{fig:mcp-f1}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=300px]{f2.png}
+\includegraphics[width=200px]{f2.png}
 \caption{$100$ simulations with optimal control (computed with $100$ samples per timestep) with $(x_0, v_0) = (0, 0)$, $A=-1$, $R=1$, $\nu=0.2$, $T=5$, $g=-10$ and $dt=0.25$.}
 \label{fig:mcp-f2}
 \end{figure}
@@ -215,7 +215,7 @@ The second-order differential equations in the mountain car problem made the pro
 \newpage
 \section{Appendix}
 \subsection{Code for the controlled random walk (MATLAB)}
-\lstinputlisting{../Control.m}
+\lstinputlisting{../Control.m}[language=Matlab,breaklines=true]
 
 \subsection{Code for the mountain car problem (iPython Notebook)}
 \subsubsection{Imports}
@@ -236,7 +236,7 @@ rc('text', usetex=True)
 sns.set_style("whitegrid", {'axes.grid' : False})
 \end{lstlisting}
 
-\subsection{Definitions}
+\subsubsection{Definitions}
 \begin{lstlisting}[language=Python]
 def L(x):
     # The definition of the valley
@@ -255,7 +255,7 @@ def F(x, g):
     return -g * dLdx(x) / np.sqrt(1 + np.power(dLdx(x), 2))
 \end{lstlisting}
 
-\subsection{Base class for simulations}
+\subsubsection{Base class for simulations}
 \begin{lstlisting}[language=Python]
 class MountainCarProblem:
     
@@ -327,7 +327,7 @@ class MountainCarProblem:
         return self.u
 \end{lstlisting}
 
-\subsection{Optimal Control}
+\subsubsection{Optimal Control}
 \begin{lstlisting}
 class OptimalControlMCP(MountainCarProblem):
     def run_uncontrolled(self, x, v, t):
@@ -360,7 +360,7 @@ class OptimalControlMCP(MountainCarProblem):
         return udt
 \end{lstlisting}
 
-\subsection{Approximating $J(x, v, t=0)$}
+\subsubsection{Approximating $J(x, v, t=0)$}
 \begin{lstlisting}
 xs = np.linspace(-2, 2, 41)
 vs = np.linspace(-2, 2, 41)
