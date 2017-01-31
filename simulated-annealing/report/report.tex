@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{color}
 \usepackage{graphicx}
+\usepackage{listings}
 \author{K.M.J. Jacobs (s4134621) \and Zhuoran Liu (s4594851) \and Ankur Ankan (s4753828)}
 \title{Simulated Annealing}
 
@@ -101,11 +102,93 @@ In conclusion, smaller $beta$ ($beta \rightarrow 0$) will result in better resul
 
 The \texttt{factor} variable defines how $\beta$ is increased at each timestep (since $\beta_{t + 1} = \beta_t \cdot \texttt{factor}$). The more $\texttt{factor} \rightarrow 1$, the more slowly $\beta$ grows and therefore the more time it takes for the sampling procedure. The larger $\texttt{factor}$, the less time it takes, but the results get worse.
 
-\subsubsection{Choice of \texttt{factor}}
+\subsubsection{Influence of the length of the Markov Chain}
+The first few samples of a Markov Chain are samples in which the system is explored. The probability of accepting any other state is relatively high. Therefore, the mean energy of these samples fluctuates a lot. If more samples are taken from the Markov Chain, the probability of accepting other states decreases. Therefore, the mean energy of the tail of the Markov Chain is stable. The longer the chain is, the longer the tail of the chain is and therefore the more stable the mean energy becomes. If the chain is shorter, then the mean energy will fluctuate more.
 
-\section{Discussion}
+\newpage
+\subsubsection{Influence of $\beta$, \texttt{factor} and the length of the Markov Chain on the minimum energy}
 
-\section{Conclusion}
+\begin{table}[h]
+\centering
+\begin{tabular}{|lll|rr|}
+\hline
+$\mathbf{\beta}$ & \texttt{factor} & $T_1$ & $\mathbb{E}(E_{\min})$ & $Var(E_{\min})$\\
+\hline
+0.01 & 1.01 & 10 & -127 & 1774\\
+0.01 & 1.01 & 1000 & -196 & 3\\
+0.01 & 1.05 & 10 & -145 & 264\\
+\textbf{0.01} & \textbf{1.05} & \textbf{1000} & \textbf{-197} & \textbf{0}\\
+0.01 & 2.00 & 10 & -190 & 47\\
+\textbf{0.01} & \textbf{2.00} & \textbf{1000} & \textbf{-197} & \textbf{0}\\
+2 & 1.01 & 10 & -112 & 798\\
+2 & 1.01 & 1000 & -191 & 43\\
+2 & 1.05 & 10 & -114 & 141\\
+2 & 1.05 & 1000 & -181 & 260\\
+2 & 2.00 & 10 & -106 & 1309\\
+2 & 2.00 & 1000 & -187 & 53\\
+\hline
+\end{tabular}
+\caption{The influence in the frustrated case of different configurations on the found minimum energy. $\mathbb{E}$ is the mean of the found minimum energies and $Var(E)$ is the variance of the found minimum energies. $T_1$ is the number of samples used for the Metropolis-Hasting algorithm. The results are based on $5$ runs of the algorithm. In the rows which have a bold typeface, the minimum of the problem was found.}
+\label{tab:parameters_frustrated}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|lll|rr|}
+\hline
+$\mathbf{\beta}$ & \texttt{factor} & $T_1$ & $\mathbb{E}(E_{\min})$ & $Var(E_{\min})$\\
+\hline
+0.01 & 1.01 & 10 & -255 & 7438\\
+\textbf{0.01} & \textbf{1.01} & \textbf{1000} & \textbf{-408} & \textbf{0}\\
+0.01 & 1.05 & 10 & -260 & 7947\\
+\textbf{0.01} & \textbf{1.05} & \textbf{1000} & \textbf{-408} & \textbf{0}\\
+\textbf{0.01} & \textbf{2.00} & \textbf{10} & \textbf{-408} & \textbf{0}\\
+\textbf{0.01} & \textbf{2.00} & \textbf{1000} & \textbf{-408} & \textbf{0}\\
+\textbf{2} & \textbf{1.01} & \textbf{10} & \textbf{-408} & \textbf{0}\\
+\textbf{2} & \textbf{1.01} & \textbf{1000} & \textbf{-408} & \textbf{0}\\
+\textbf{2} & \textbf{1.05} & \textbf{10} & \textbf{-408} & \textbf{0}\\
+\textbf{2} & \textbf{1.05} & \textbf{1000} & \textbf{-408} & \textbf{0}\\
+\textbf{2} & \textbf{2.00} & \textbf{10} & \textbf{-408} & \textbf{0}\\
+\textbf{2} & \textbf{2.00} & \textbf{1000} & \textbf{-408} & \textbf{0}\\
+\hline
+\end{tabular}
+\caption{The influence in the ferromagnetic case of different configurations on the found minimum energy. $\mathbb{E}$ is the mean of the found minimum energies and $Var(E)$ is the variance of the found minimum energies. $T_1$ is the number of samples used for the Metropolis-Hasting algorithm. The results are based on $5$ runs of the algorithm. In the rows which have a bold typeface, the minimum of the problem was found.}
+\label{tab:parameters_ferromagnetic}
+\end{table}
+
+In table \ref{tab:parameters_frustrated} and \ref{tab:parameters_ferromagnetic} a comparison is made between different configurations and the found optimal energy. It indeed corresponds to our findings that a larger $T_1$ yields better results. Also, the more $\beta \rightarrow 0$ and $\texttt{factor} \rightarrow 1$, the better the results will get.
+
+For the ferromagnetic problem, we get that $E_{\min} \approx -408$ and for the frustrated problem we found that $E_{\min} \approx -197$. As we explain later, different runs for $\texttt{makedata}$ when using the same random number generator seed resulted in different values of $w$. Therefore, we keep $w$ fixed in both situations.
+
+\subsubsection{Comparison between Simulated Annealing (SA) and the iterative method (Iter)}
+
+\textbf{Ferromagnetic system}\\
+For a ferromagnetic system, both Simulated Annealing and the iterative method will converge.
+
+For the iterative method, the running time depends on the number of restarts as specified in the iterative method.
+
+The running time of the Simulated Annealing depends on the number of samples for estimating the maximum $dE$ and it depends on the length of the Markov Chain.
+
+For the iterative method with a neighbourhood size of $2$ and $800$ number of restarts and with a dimensionality $n=250$ we reach approximately the fastest running time of $0.29$ seconds.
+
+For the Simulated Annealing, we reached approximately the fastest running time of $0.88$ seconds with $n=250$, a Markov Chain length of $1000$ and the number of samples for estimating $\max(dE)$ equal to $100$.
+
+\textbf{Frustrated system}\\
+For the iterative method with a neighbourhood size of $2$ and $150.000$ number of restarts and with a dimensionality $n=250$ we reach approximately the fastest running time of $58$ seconds.
+
+For the Simulated Annealing, we reached approximately the fastest running time of $13$ seconds with $n=250$, a Markov Chain length of $1000$ and the number of samples for estimating $\max(dE)$ equal to $100$.
+
+\textbf{Conclusion}\\
+Since there are so many parameters, it is hard to compare both methods. Also the running time depends on the hardware which is used and even if we analyze the running time by means of upper bounds, there are some random variables which cause undeterministic running times.
+
+If the running times are compared when solving a frustrated system, then it is extremely difficult for the iterative method to find the optimal solution. The Simulated Annealing however is faster and finds the optimal solution.
+
+\subsubsection{Comparison for $n=200$}
+We had difficulties in comparing $w$ since the $\texttt{sprandsym}$ gave different values even if the seed for the random number generator was set to the same number on different computers. Therefore, we computed a random symmetric binary matrix $w$ in ourselves. This yields the same $w$ matrix on different computers when we used the same number for the seed for the random number generator.
+
+On both computers, we found $E_{\min} = -10080$.
+
+\section{Discussion and Conclusions}
 
 \newpage
 \section{Appendix}

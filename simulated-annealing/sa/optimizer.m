@@ -120,10 +120,10 @@ case 'sa'
 	T1=1000; % length markov chain at fixed temperature
 	factor=1.05 ; % increment of beta at each new chain
     
-    %beta_init = 2;
-    %factor = 2;
-    T1=1000;
-
+    beta_init = 2;
+    factor = 2;
+    T_1=1000;
+    
 	beta=beta_init;
 	E_bar(1)=1;
 	t2=0;
